@@ -119,6 +119,25 @@ Mel bins transform the spectrogram into a perceptually meaningful frequency repr
 **Model pruning** <br>
 Before deploying the model and using it in the VUI class, we have to make sure the latency and memory constraint can be satisfied. This goal is reached by using _unstructured pruning_, which is a technique that consists in removing weigths that have a small value (close to zero) in order to reduce the model size without risking to lose important information.  In particular, the pruning is performed gradually increasing the number of weights that we remove, to avoid a sudden drop in accuracy. 
 
+## Communication paradigms
+The collected data is stored in Redis, which is a cloud platform often used to handle real-time data. 
+### MQTT - Message Queuing Telemetry Transport
+MQTT is an asyncronous communication protocol, based on a publisher/subscriber model. It is a lightweight protocol used for real-time communication in memory constrained device with low bandwidth, therefore it is perfect for IoT applications. <br>
+
+In this protocol, the publisher posts info on a specific topic (in this case the student ID), so that only subscriber subscribed to that topic will recieve the msessages. <br>
+
+The **publisher** runs continuously on the Raspberry Pi, reads the DHT11 sensor every 2 seconds, packages the readings along with device ID and timestamp into a JSON message, and publishes it to an MQTT topic. This allows any MQTT subscriber to receive real-time sensor data. <br>
+
+The **subscriber** continuously listens to a specific topic on the MQTT broker. When a message arrives, it decodes the JSON payload, extracts the device ID, timestamp, temperature, and humidity, and stores these values in Redis as a time-series. This allows us to keep a real-time, historical record of sensor data while also logging messages for verification.
+
+### REST API - Representational State Transfer Application Programming Interface
+REST is an HTTP-based communication protocol. It is based on a client/server dynamic and it's used to retrieve data from redis. <br>
+
+In REST, the **server** hosts endpoints and responds to requests, while the client initiates requests to retrieve data. A REST endpoint is a specific URL on a server where clients can send requests to access or modify a resource. It defines both the resource location and the action allowed, such as GET to retrieve data or POST to submit data
+
+The **client** initiates requests to retrieve data. Since the requested action is to retrieve data, the GET method was implemented, as it should be used for read-only operations 
+
+
 ## Results
 The results in terms of accuracy, size, and latency are the following: <br>
 - Accuracy: 99.5%
