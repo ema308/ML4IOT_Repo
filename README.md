@@ -104,6 +104,20 @@ If that is the case, a lock time of 5 seconds is enabled in order to:
 **The ```collect_data```method** <br>
 The ```collect_data``` method reads temperature and humidity data from the dht sensors and computes the current timestamp, so that a time-series dataset can be created. 
 
+## Speech recognition and model optimization
+In the second part of the project that collection isn't simply activated by random speech, but a model is trained to recognize the words "up" and "down" that activate the whole system. <br>
+
+The model is a lightweight Convolutional Neural Network (CNN) built with Depth-Wise Separable Convolutions (DS-CNN) and designed for efficient keyword spotting on resource-constrained devices. It is specifically trained to recognize the words "up" and "down" with high accuracy and efficiency, meeting the constraints of accuracy >99.4%, latency <40 ms, and model size <50 KB. <br>
+
+In particular, this model returns as output the probabilities for predicting the words "up" and "down". By loading the model into the ```VUI``` class, and checking whenever speech is detected if this corresponds to the words "up" or "down", data collection can be enabled and disabled using these specific voice commands. 
+
+**The ```MFCC``` class** <br>
+The model can't work with raw audio data and even using the Spectrogram itslef would be costly in terms of efficiency. For this reason we use Mel bins and the Mel Frequency Cepstral Coefficients.
+
+Mel bins transform the spectrogram into a perceptually meaningful frequency representation. MFCC then compress this representation into a compact set of coefficients that capture the essential spectral shape of speech. This reduces dimensionality and makes the model more efficient and robust, especially for keyword spotting on edge devices.
+
+**Model pruning** <br>
+Before deploying the model and using it in the VUI class, we have to make sure the latency and memory constraint can be satisfied. This goal is reached by using _unstructured pruning_, which is a technique that consists in removing weigths that have a small value (close to zero) in order to reduce the model size without risking to lose important information.  In particular, the pruning is performed gradually increasing the number of weights that we remove, to avoid a sudden drop in accuracy. 
 
 ## Results
 The results in terms of accuracy, size, and latency are the following: <br>
