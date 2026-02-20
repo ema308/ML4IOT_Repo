@@ -76,14 +76,33 @@ In particular:
 **Detect non-silent frames**
 The Spectrogram is converted into dB and the average energy per frame is computed. To detect non-silent audios:
 
-- average energy frames are compared with ```db.Tresh```, if the energy is greater than the treshold the frame is loud enough
+- average energy frames are compared with ```db.Tresh```, if the energy is greater than the threshold the frame is loud enough
 - loud enough frames are summed up in order to estimate speech duration
-- the estimated speech duration is compared with ```duration_tresh```, if the speech is grater than the treshold then it can be recognized as valid and flagged with 0 (approved)
+- the estimated speech duration is compared with ```duration_tresh```, if the speech is greater than the threshold then it can be recognized as valid and flagged with 0 (approved)
 
 **Accuracy constraint**
 We can then choose a search space for each of the previously mentioned parameters a perform a grid search to find the optimal values. In particular, we want to compute the accuracy on the VAD dataset, by checking how many audios are correctly classified as silent.
 We then print the top 5 parameters combination sorted by the highest accuracy values. 
 
+### AudioProcessor and AudioNormalization classes
+```AudioProcessor```class makes sure that all the audio inputs have the same sampling rate and format (tensor shape, data type float32). 
+```AudioNormalization``` class makes sure that all the audios have amplitude scaled in the same range to avoid outliers and speed up convergence 
+
+### Voice User Interface (VUI) class
+The role of this class is picking up audios from the microphone and start the data collection based on word recognition. 
+
+**The ```run``` method** <br>
+This method is in charge of continuously picking up data from the microphone and sending it to the ```_audio_callback_``` method to analyze it. If speech is detected, the  ```run``` method is also in charge of activating data collection every two seconds.
+
+**The ```_audio_callback_``` method** <br>
+This method is used to analyze audios from the microphone, after applying preprocessing and normalization steps, it calls the ```is_silence``` method from VAD to detect whether someone is actually speaking. 
+If that is the case, a lock time of 5 seconds is enabled in order to:
+
+- prevent rapid on/off of the system if new signals are detected
+- start data collection by calling ```collect_data```
+
+**The ```collect_data```method** <br>
+The ```collect_data``` method reads temperature and humidity data from the dht sensors and computes the current timestamp, so that a time-series dataset can be created. 
 
 
 ## Results
