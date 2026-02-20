@@ -59,6 +59,33 @@ HW3: Redis Time-Series Storage
 
 - Python 3.8+
 
+## Relevant classes and methods
+
+### Voice Activity Detection (VAD) class
+The VAD class takes as inputs audio files from the VAD dataset, it extracts relevant features and uses them to determine whether an audio file is silent or not using the ```is_silent``` method. 
+The method works in the following way:
+
+**Computation of the Spectrogram**
+A Spectrogram is a visual representation of how frequencies change over time (color intensity = loudness). It maps on the x-axis the time, and on the y-axis the frequency variation. It is often computed using the FFT, which is an algorithm that computes the frequency components of a signal in a very fast way. 
+
+In particular:
+- ```sampling_rate```: conventionally set at 1600 kHz (one sample of the audio every second)
+- ```frame_length_in_s```: temporal window in which the FFT is computed, conventionally set at 0.04 s
+- ```frame_step_in_s```: temporal distance between a window and the next one, conventionally set at 0.01 s (overlap between windows of 75%)
+
+**Detect non-silent frames**
+The Spectrogram is converted into dB and the average energy per frame is computed. To detect non-silent audios:
+
+- average energy frames are compared with ```db.Tresh```, if the energy is greater than the treshold the frame is loud enough
+- loud enough frames are summed up in order to estimate speech duration
+- the estimated speech duration is compared with ```duration_tresh```, if the speech is grater than the treshold then it can be recognized as valid and flagged with 0 (approved)
+
+**Accuracy constraint**
+We can then choose a search space for each of the previously mentioned parameters a perform a grid search to find the optimal values. In particular, we want to compute the accuracy on the VAD dataset, by checking how many audios are correctly classified as silent.
+We then print the top 5 parameters combination sorted by the highest accuracy values. 
+
+
+
 ## Results
 The results in terms of accuracy, size, and latency are the following: <br>
 - Accuracy: 99.5%
