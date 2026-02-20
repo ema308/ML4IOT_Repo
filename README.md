@@ -1,7 +1,7 @@
 # Voice-Activated Environmental Monitoring System
 
 ## Project Overview:
-A Raspberry Pi–based system that uses a custom voice interface to trigger real-time humidity and temperature data collection. The system listens for the keywords “go” and “stop”, activates sensors accordingly, stores results as time series in Redis, and exposes them through a REST API.
+A Raspberry Pi–based system that uses a custom voice interface to trigger real-time humidity and temperature data collection. The system listens for the keywords “up” and “down”, activates sensors accordingly, stores results as time series in Redis, and exposes them through a REST API.
 This project combines embedded hardware, keyword spotting, time-series data processing, and backend API development.
 
 ## Project structure 
@@ -39,8 +39,8 @@ HW2: Model training
 - Audio frames are processed in real time.
 - When the model predicts:
 
-  “go” → begin collecting humidity and temperature readings.
-  “stop” → stop collecting sensor data.
+  “up” → begin collecting humidity and temperature readings.
+  “down” → stop collecting sensor data.
 
 
 HW3: Redis Time-Series Storage
